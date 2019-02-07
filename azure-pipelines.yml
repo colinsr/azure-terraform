@@ -10,8 +10,15 @@ pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- script: |
+    echo Installing Terraform binary
+    apt-get install unzip wget
+    wget https://releases.hashicorp.com/terraform/0.11.10/terraform_0.11.10_linux_amd64.zip
+    unzip terraform_0.11.10_linux_amd64.zip
+    sudo mv terraform /usr/local/bin/
+    TF_VERSION=$(terraform --version)
+    echo "Terraform version => $TF_VERSION"
+  displayName: 'Install Terraform binary'
 
 - script: |
     echo Add other tasks to build, test, and deploy your project.
