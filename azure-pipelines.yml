@@ -11,13 +11,14 @@ pool:
 
 steps:
 - script: |
-    echo Installing Terraform binary
+    TIMESTAMP="echo $(TZ=America/New_York date +"%m-%d-%y %r" | sed -e 's/\([0-9][0-9]:[0-9][0-9]\):[0-9][0-9]/\1/')"
+    echo "$(eval TIMESTAMP) \tInstalling Terraform binary"
     apt-get install unzip wget
     wget https://releases.hashicorp.com/terraform/0.11.10/terraform_0.11.10_linux_amd64.zip
     unzip terraform_0.11.10_linux_amd64.zip
     sudo mv terraform /usr/local/bin/
     TF_VERSION=$(terraform --version)
-    echo "Terraform version => $TF_VERSION"
+    echo -e "$(eval TIMESTAMP) \tInstalled Terraform binary\n\t\tTerraform version => $TF_VERSION"
   displayName: 'Install Terraform binary'
 
 - script: |
