@@ -1,0 +1,8 @@
+steps:
+- script: |
+    export tenant_id="$(TENANT-ID)"
+    export subscription_id="$(SUB-ID)"
+    export client_id="$(CLIENT-ID)"
+    export client_secret="$(CLIENT-SECRET)"
+  workingDirectory: '$(Build.SourcesDirectory)'
+  displayName: 'Configure Terraform'

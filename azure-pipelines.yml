@@ -1,27 +1,41 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
+# YAML reference => https://rebrand.ly/az-devops-yaml
+
+name: $(BuildDefinitionName).$(Date:yyyyMMdd)$(Rev:.rr) 
+# ^^ https://docs.microsoft.com/en-us/azure/devops/pipelines/build/options?view=azure-devops&viewFallbackFrom=vsts&tabs=yaml#build-number-format
 
 trigger:
-- master
+  batch: true # Queue up builds, only 1 at a time
+  branches:
+    include:
+      - master
+      - feature/*
+    exclude:
+      - foobar/*
+  # paths:
+  #   include:
+  #     - 'pharmacy'
+
+# variables:
+# - name: state.key
+#   value: 'TFSTATE'
+# - name: terraform.path
+#   value: 'SOMEPATH/DEV/AKS'
+# - group: 'KEY-VAULT-VAR-GROUP'
+# - group: 'STANDARD-VAR-GROUP'
 
 pool:
   vmImage: 'Ubuntu-16.04'
 
 steps:
-- script: |
-    TIMESTAMP="echo $(TZ=America/New_York date +"%m-%d-%y %r" | sed -e 's/\([0-9][0-9]:[0-9][0-9]\):[0-9][0-9]/\1/')"
-    echo "$(eval TIMESTAMP) \tInstalling Terraform binary"
-    apt-get install unzip wget
-    wget https://releases.hashicorp.com/terraform/0.11.10/terraform_0.11.10_linux_amd64.zip
-    unzip terraform_0.11.10_linux_amd64.zip
-    sudo mv terraform /usr/local/bin/
-    TF_VERSION=$(terraform --version)
-    echo -e "$(eval TIMESTAMP) \tInstalled Terraform binary\n\t\tTerraform version => $TF_VERSION"
-  displayName: 'Install Terraform binary'
+- checkout: self
+  clean: true
+  persistCredentials: true
+  displayName: 'Checkout repo'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+# Move to central repo to share steps => https://rebrand.ly/az-devops-step-templates
+- template: az-devops-templates/install-tf.yml
+
+- template: az-devops-templates/configure-tf.yml
+
+- script: echo Done with build
+  displayName: 'Announce complete....'
